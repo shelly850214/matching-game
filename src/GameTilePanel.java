@@ -10,11 +10,9 @@ public class GameTilePanel extends JPanel
     JButton[] tiles;  // tiles used for games
     DefaultListModel playerLabels;  // list of player labels
     ArrayList<Integer> tilesSelected; // tiles selected
-    
     int[] answers;          // number answers DEBUGGING ONLY
     Player[] players;       // player objects carrying player state
     int currentTurn;      // current turn number
-    boolean processEvents;
  //   int avgAttempts;      // average attempts taken by user in single player
  //   int sumAttempts;       // sum of attempts taken in single player mode
     HistoryPanel historyPanel;  // panel that keeps track of history state
@@ -46,7 +44,7 @@ public class GameTilePanel extends JPanel
         {
             // initalize tile button
             tiles[i] = new JButton();
-            tiles[i].setDisabledIcon(new ImageIcon("null"));
+
             // disable all buttons
             tiles[i].setEnabled(false);
 
@@ -101,8 +99,6 @@ public class GameTilePanel extends JPanel
         // clear players score list
         playerLabels.removeAllElements();
 
-        processEvents = true;
-
         // initalize all players
         for (int i = 0; i < players.length; i++)
         {
@@ -124,7 +120,9 @@ public class GameTilePanel extends JPanel
         // enable all of the buttons
         for (int i = 0; i < tiles.length; i++)
         {
-            tiles[i].setIcon(null);
+            tiles[i].setText("");
+            tiles[i].setIcon(new ImageIcon("null"));
+            tiles[i].setDisabledIcon(new ImageIcon("null"));
             tiles[i].setEnabled(true);
         }
     }
@@ -180,12 +178,10 @@ public class GameTilePanel extends JPanel
             int currPlayer;
             int maxPlayerIndex = 0;
 
-            if (!processEvents || tilesSelected.contains(numButton))
-                return;
-
             //sourceTile.setText(new Integer(answers[numButton]).toString());
             //sourceTile.setIcon(img[numButton]);
-            sourceTile.setIcon(img[numButton]);
+            sourceTile.setDisabledIcon(img[numButton]);
+            sourceTile.setEnabled(false);
 
             // add tile to selected tiles array
             tilesSelected.add(numButton);
@@ -275,21 +271,36 @@ public class GameTilePanel extends JPanel
                 {
 
                     // disable all tiles
-                    processEvents = false;
-
+                    System.out.println("disabled");
+                    for (int i = 0; i < tiles.length; i++)
+                    {
+                        tiles[i].setEnabled(false);
+                    }
                     timer.schedule(new TimerTask() {
                         public void run()
                         {
-                            tiles[first].setIcon(null);
+                            tiles[first].setEnabled(true);
+                            tiles[first].setText("");
+                            tiles[first].setDisabledIcon(new ImageIcon("null"));
 
-                            tiles[second].setIcon(null);
+                            tiles[second].setEnabled(true);
+                            tiles[second].setText("");
+                            tiles[second].setDisabledIcon(new ImageIcon("null"));
 
 
                             // re-enable
-                            processEvents = true;
+                            for (int i = 0; i < tiles.length; i++)
+                            {
+                                tiles[i].setEnabled(true);
+                            }
+
                             tilesSelected.remove(tilesSelected.size() - 1);
                             tilesSelected.remove(tilesSelected.size() - 1);
 
+                            for (int i = 0; i < tilesSelected.size(); i++)
+                            {
+                                tiles[tilesSelected.get(i)].setEnabled(false);
+                            }
                         }
                     }, 1000);
 
